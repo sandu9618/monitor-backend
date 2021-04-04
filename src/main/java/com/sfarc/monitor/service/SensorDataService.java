@@ -1,6 +1,6 @@
 package com.sfarc.monitor.service;
 
-import com.sfarc.monitor.model.SensorData;
+import com.sfarc.monitor.entity.SensorData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
