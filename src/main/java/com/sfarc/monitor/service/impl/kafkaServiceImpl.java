@@ -1,6 +1,6 @@
-package com.sfarc.monitor.services.impl;
+package com.sfarc.monitor.service.impl;
 
-import com.sfarc.monitor.services.KafkaService;
+import com.sfarc.monitor.service.KafkaService;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
