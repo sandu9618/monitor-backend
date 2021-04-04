@@ -1,9 +1,11 @@
 package com.sfarc.monitor.component.logic;
 
+import com.sfarc.monitor.component.logic.impl.TemperatureLogic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -13,23 +15,35 @@ import java.util.Set;
 @Component
 public class LogicFactory
 {
-	private HashMap<LogicName, Logic> logics;
+	private HashMap<LogicName, Logic> logics = new HashMap<>();
 
-	@Autowired
-	public LogicFactory( Set< Logic > logicSet )
+	public Logic findLogic( LogicName logicName)
 	{
-		createLogic( logicSet );
+		System.out.println(logicName);
+		Logic logic = null;
+
+		if (logics.containsKey( logicName ))
+		{
+			logic = logics.get( logicName );
+		}
+		else
+		{
+			logic = createLogic( logicName );
+			logics.put( logicName, logic );
+		}
+
+		return logic;
 	}
 
-	public Logic findLogic(LogicName logicName)
+	private Logic createLogic(LogicName logicName)
 	{
-		return logics.get(logicName);
-	}
+		switch( logicName )
+		{
+			case TEMP_LOGIC:
+				return new TemperatureLogic();
 
-	private void createLogic(Set<Logic> logicSet)
-	{
-		logics = new HashMap<LogicName, Logic>();
-		logicSet.forEach(
-				logic ->logics.put(logic.getLogicName(), logic));
+			default:
+				return null;
+		}
 	}
 }

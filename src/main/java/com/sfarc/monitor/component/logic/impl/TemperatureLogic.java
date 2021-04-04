@@ -11,13 +11,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class TemperatureLogic implements Logic
 {
-	@Override public boolean check(String dataValue)
+	@Override
+	public boolean check(String dataValue)
 	{
 		double checkingValue = Double.parseDouble( dataValue.substring( 0 , dataValue.length() - 1 ) );
 		return checkingValue > 20;
 	}
 
-	@Override public LogicName getLogicName()
+	@Override
+	public LogicName getLogicName()
 	{
 		return LogicName.TEMP_LOGIC;
 	}
