@@ -1,4 +1,4 @@
-package com.sfarc.monitor.controller;
+package com.sfarc.monitor.web.controller;
 
 import com.sfarc.monitor.entity.SensorData;
 import com.sfarc.monitor.service.AlertService;
