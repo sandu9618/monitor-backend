@@ -40,6 +40,4 @@ public class SensorDataDto implements Serializable {
     @NotNull
     private String value;
 
-    public SensorDataDto(String sensorId, String value) {
-    }
 }
