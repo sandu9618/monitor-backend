@@ -14,6 +14,7 @@ import com.sfarc.monitor.entity.User;
 import com.sfarc.monitor.repository.AlertRepository;
 import com.sfarc.monitor.repository.SensorRepository;
 import com.sfarc.monitor.repository.UserRepository;
+import com.sfarc.monitor.web.exception.FailedProcessingSensorDataException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -60,9 +61,8 @@ public class AlertService
 	 * Checking sensor data with defined logic s
 	 *
 	 * @param sensorData The Sensor Data
-	 * @return Accepted Response Entity
 	 */
-	public ResponseEntity checkSensorData( SensorData sensorData )
+	public void checkSensorData( SensorData sensorData )
 	{
 		Logic logic = logicFactory.findLogic( LogicFinder.findLogicName( sensorData.getSensorId() ) );
 
@@ -78,19 +78,18 @@ public class AlertService
 				voiceCallNotifier.notifyUser( notificationModel );
 				smsNotifier.notifyUser( notificationModel );
 
-				alertRepository.save( sensorData );
+				alertRepository.save(sensorData);
 			}
 
-			return ResponseEntity
-					.status( HttpStatus.ACCEPTED )
-					.build();
 		}
 		catch( Exception ex )
 		{
 			ex.printStackTrace();
-			return ResponseEntity
-					.status( HttpStatus.INTERNAL_SERVER_ERROR )
-					.build();
+			throw new FailedProcessingSensorDataException();
+
+//			return ResponseEntity
+//					.status( HttpStatus.INTERNAL_SERVER_ERROR )
+//					.build();
 		}
 
 	}
