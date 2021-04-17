@@ -11,7 +11,7 @@ cd ..\kafka
 ```
 - Create Kafka topic
 ```
- .\bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 3 --topic messages
+ .\bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 3 --topic sensorData
 ```
 - Run Spring boot application
 - Run Angular application
