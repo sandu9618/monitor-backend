@@ -2,6 +2,9 @@ package com.sfarc.monitor.web.controller;
 
 import com.sfarc.monitor.entity.SensorData;
 import com.sfarc.monitor.service.AlertService;
+import com.sfarc.monitor.service.KafkaService;
+import com.sfarc.monitor.service.SensorDataService;
+import com.sfarc.monitor.web.mappers.SensorDataMapper;
 import com.sfarc.monitor.web.exception.BadRequestException;
 import com.sfarc.monitor.web.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +26,18 @@ public class SensorDataController
 	@Autowired
 	private AlertService alertService;
 
+	@Autowired
+	private KafkaService kafkaService;
+
+	private SensorDataMapper sensorDataMapper;
+
 	@PostMapping
-	public ResponseEntity<ApiResponse> collectSensorData(@Validated  @RequestBody SensorData sensorData )
+	public ResponseEntity<ApiResponse>  collectSensorData( @RequestBody SensorDataDto sensorDataDto )
 			throws BadRequestException
 	{
-		alertService.checkSensorData( sensorData );
+		kafkaService.sendToKafka(sensorDataDto);
+		alertService.checkSensorData( sensorDataDto );
+
 		ApiResponse apiResponse = ApiResponse
 				.builder()
 				.status(true)

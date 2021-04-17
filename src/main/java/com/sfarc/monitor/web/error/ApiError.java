@@ -25,7 +25,7 @@ public class ApiError implements Serializable {
     private LocalDateTime timestamp;
     private String message;
     private String debugMessage;
-    private List<ApiSubError> subErrors;
+//    private List<ApiSubError> subErrors;
 
     private ApiError() {
         timestamp = LocalDateTime.now();

@@ -1,9 +1,7 @@
 package com.sfarc.monitor.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
@@ -20,10 +18,12 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class SensorDataDto implements Serializable {
 
     @Null
-    private Integer sensorId;
+    private String sensorId;
 
     @Null
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZ", shape=JsonFormat.Shape.STRING)
@@ -39,4 +39,7 @@ public class SensorDataDto implements Serializable {
 
     @NotNull
     private String value;
+
+    public SensorDataDto(String sensorId, String value) {
+    }
 }

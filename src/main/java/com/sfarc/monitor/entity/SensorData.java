@@ -1,9 +1,7 @@
 package com.sfarc.monitor.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.Id;
@@ -19,6 +17,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Document(collection = "sensor_data")
 public class SensorData
 {
@@ -36,6 +36,4 @@ public class SensorData
 
 	private String value;
 
-	public SensorData(int sensorId, String value) {
-	}
 }
