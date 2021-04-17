@@ -1,4 +1,4 @@
-package com.sfarc.monitor.dto;
+package com.sfarc.monitor.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;

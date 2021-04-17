@@ -1,8 +1,8 @@
 package com.sfarc.monitor.web.controller;
 
 
-import com.sfarc.monitor.constant.KafkaConstants;
-import com.sfarc.monitor.dto.SensorDataDto;
+import com.sfarc.monitor.config.KafkaConstants;
+import com.sfarc.monitor.web.dto.SensorDataDto;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

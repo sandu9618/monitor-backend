@@ -1,7 +1,7 @@
 package com.sfarc.monitor.service;
 
-import com.sfarc.monitor.constant.KafkaConstants;
-import com.sfarc.monitor.dto.SensorDataDto;
+import com.sfarc.monitor.config.KafkaConstants;
+import com.sfarc.monitor.web.dto.SensorDataDto;
 import com.sfarc.monitor.entity.SensorData;
 import com.sfarc.monitor.web.mappers.SensorDataMapper;
 import org.apache.kafka.clients.producer.RecordMetadata;
