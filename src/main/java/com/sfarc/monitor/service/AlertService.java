@@ -8,12 +8,14 @@ import com.sfarc.monitor.component.model.NotificationModel;
 import com.sfarc.monitor.component.notifiers.EmailNotifier;
 import com.sfarc.monitor.component.notifiers.SMSNotifier;
 import com.sfarc.monitor.component.notifiers.VoiceCallNotifier;
+import com.sfarc.monitor.dto.SensorDataDto;
 import com.sfarc.monitor.entity.Sensor;
 import com.sfarc.monitor.entity.SensorData;
 import com.sfarc.monitor.entity.User;
 import com.sfarc.monitor.repository.AlertRepository;
 import com.sfarc.monitor.repository.SensorRepository;
 import com.sfarc.monitor.repository.UserRepository;
+import com.sfarc.monitor.web.mappers.SensorDataMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,17 +56,22 @@ public class AlertService
 	@Autowired
 	private VoiceCallNotifier voiceCallNotifier;
 
+	@Autowired
+	private SensorDataMapper sensorDataMapper;
 
 
 	/**
 	 * Checking sensor data with defined logic s
 	 *
-	 * @param sensorData The Sensor Data
+	 * @param sensorDataDto The Sensor Data
 	 * @return Accepted Response Entity
 	 */
-	public ResponseEntity checkSensorData( SensorData sensorData )
+	public ResponseEntity checkSensorData( SensorDataDto sensorDataDto )
 	{
-		Logic logic = logicFactory.findLogic( LogicFinder.findLogicName( sensorData.getSensorId() ) );
+
+		SensorData sensorData = sensorDataMapper.sensorDtaDtoToSensorData(sensorDataDto);
+
+		Logic logic = logicFactory.findLogic( LogicFinder.findLogicName(  sensorData.getSensorId() ) );
 
 		try
 		{

@@ -1,7 +1,11 @@
 package com.sfarc.monitor.web.controller;
 
+import com.sfarc.monitor.dto.SensorDataDto;
 import com.sfarc.monitor.entity.SensorData;
 import com.sfarc.monitor.service.AlertService;
+import com.sfarc.monitor.service.KafkaService;
+import com.sfarc.monitor.service.SensorDataService;
+import com.sfarc.monitor.web.mappers.SensorDataMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,8 +24,14 @@ public class SensorDataController
 	@Autowired
 	private AlertService alertService;
 
+	@Autowired
+	private KafkaService kafkaService;
+
+	private SensorDataMapper sensorDataMapper;
+
 	@PostMapping
-	public ResponseEntity collectSensorData( @RequestBody SensorData sensorData ){
-		return alertService.checkSensorData( sensorData );
+	public ResponseEntity collectSensorData( @RequestBody SensorDataDto sensorDataDto ){
+		kafkaService.sendToKafka(sensorDataDto);
+		return alertService.checkSensorData( sensorDataDto );
 	}
 }
