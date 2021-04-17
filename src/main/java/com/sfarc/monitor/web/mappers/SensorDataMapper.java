@@ -1,6 +1,6 @@
 package com.sfarc.monitor.web.mappers;
 
-import com.sfarc.monitor.dto.SensorDataDto;
+import com.sfarc.monitor.web.dto.SensorDataDto;
 import com.sfarc.monitor.entity.SensorData;
 import org.mapstruct.Mapper;
 

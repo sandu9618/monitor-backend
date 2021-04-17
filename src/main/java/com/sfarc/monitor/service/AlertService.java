@@ -8,7 +8,7 @@ import com.sfarc.monitor.component.model.NotificationModel;
 import com.sfarc.monitor.component.notifiers.EmailNotifier;
 import com.sfarc.monitor.component.notifiers.SMSNotifier;
 import com.sfarc.monitor.component.notifiers.VoiceCallNotifier;
-import com.sfarc.monitor.dto.SensorDataDto;
+import com.sfarc.monitor.web.dto.SensorDataDto;
 import com.sfarc.monitor.entity.Sensor;
 import com.sfarc.monitor.entity.SensorData;
 import com.sfarc.monitor.entity.User;
@@ -18,9 +18,9 @@ import com.sfarc.monitor.repository.UserRepository;
 import com.sfarc.monitor.web.mappers.SensorDataMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import com.sfarc.monitor.web.exception.FailedProcessingSensorDataException;
+
 
 import java.util.Optional;
 
@@ -60,18 +60,16 @@ public class AlertService
 	private SensorDataMapper sensorDataMapper;
 
 
+
 	/**
 	 * Checking sensor data with defined logic s
 	 *
 	 * @param sensorDataDto The Sensor Data
-	 * @return Accepted Response Entity
 	 */
-	public ResponseEntity checkSensorData( SensorDataDto sensorDataDto )
+	public void checkSensorData(SensorDataDto sensorDataDto)
 	{
-
 		SensorData sensorData = sensorDataMapper.sensorDtaDtoToSensorData(sensorDataDto);
-
-		Logic logic = logicFactory.findLogic( LogicFinder.findLogicName(  sensorData.getSensorId() ) );
+		Logic logic = logicFactory.findLogic( LogicFinder.findLogicName( sensorData.getSensorId() ) );
 
 		try
 		{
@@ -88,16 +86,12 @@ public class AlertService
 				alertRepository.save( sensorData );
 			}
 
-			return ResponseEntity
-					.status( HttpStatus.ACCEPTED )
-					.build();
 		}
 		catch( Exception ex )
 		{
 			ex.printStackTrace();
-			return ResponseEntity
-					.status( HttpStatus.INTERNAL_SERVER_ERROR )
-					.build();
+			throw new FailedProcessingSensorDataException();
+
 		}
 
 	}

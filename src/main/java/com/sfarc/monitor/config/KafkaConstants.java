@@ -1,4 +1,4 @@
-package com.sfarc.monitor.constant;
+package com.sfarc.monitor.config;
 
 /**
  * @author Sanduni Pavithra
