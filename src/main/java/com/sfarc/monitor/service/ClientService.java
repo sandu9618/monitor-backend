@@ -1,21 +1,15 @@
 package com.sfarc.monitor.service;
 
-import com.sfarc.monitor.config.Constants;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sfarc.monitor.web.dto.SensorDataDto;
-import com.sfarc.monitor.entity.SensorData;
-import com.sfarc.monitor.web.mappers.SensorDataMapper;
-import org.apache.kafka.clients.producer.RecordMetadata;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.WebSocketSession;
 
-import java.util.UUID;
-import java.util.concurrent.*;
+import java.io.IOException;
 
 /**
  * @author Sanduni Pavithra
@@ -25,15 +19,27 @@ import java.util.concurrent.*;
 @Service
 public class ClientService {
 
-    @Autowired
-    private SensorDataMapper sensorDataMapper;
+    private WebSocketSession webSocketSession;
+
+    ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
     @Autowired
-    private SimpMessagingTemplate webSocket;
+    WebSocketHandler getChatWebSocketHandler;
 
-    public void sendToClient(SensorDataDto sensorDataDto) {
-        SensorData sensorData = sensorDataMapper.sensorDtaDtoToSensorData(sensorDataDto);
-        this.webSocket.convertAndSend(Constants.WEBSOCKET_DESTINATION, sensorData.getValue());
+    public void sendToClient(SensorDataDto sensorDataDto) throws IOException {
+        try {
+            SingleClientSession singleClientSession = new SingleClientSession();
 
+            this.webSocketSession = singleClientSession.getWebSocketSession();
+
+            String json = ow.writeValueAsString(sensorDataDto);
+
+            webSocketSession.sendMessage(new TextMessage(json));
+            webSocketSession.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            webSocketSession.close();
+        }
     }
 }
