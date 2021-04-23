@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import com.sfarc.monitor.web.exception.FailedProcessingSensorDataException;
 
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 /**
@@ -75,15 +76,14 @@ public class AlertService
 		{
 			if (logic.check( sensorData.getValue() ))
 			{
-				Optional <User> optionalUser = userRepository.findUserByUserSensors( sensorData.getSensorId() );
-				Optional< Sensor > optionalSensor = sensorRepository.findSensorBySensorId( sensorData.getSensorId() );
-
-				NotificationModel notificationModel = notificationModelConverter.convert( optionalUser.get(), optionalSensor.get(), sensorData  );
+				User user = userRepository.findUserByUserSensors( sensorData.getSensorId() ).orElseThrow(EntityNotFoundException::new);
+				Sensor sensor = sensorRepository.findSensorBySensorId( sensorData.getSensorId() ).orElseThrow(EntityNotFoundException::new);
+				NotificationModel notificationModel = notificationModelConverter.convert( user, sensor, sensorData  );
 				emailNotifier.notifyUser( notificationModel );
 				voiceCallNotifier.notifyUser( notificationModel );
 				smsNotifier.notifyUser( notificationModel );
 
-				alertRepository.save( sensorData );
+				alertRepository.save( sensorData ); // TODO: alertRepository should save alert data, not sensor data
 			}
 
 		}

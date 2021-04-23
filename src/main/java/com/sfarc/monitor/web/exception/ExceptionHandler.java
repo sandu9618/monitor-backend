@@ -7,8 +7,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import javax.persistence.EntityNotFoundException;
+
+import static org.springframework.http.HttpStatus.*;
 
 /**
  * @author = madhuwantha
@@ -47,5 +48,19 @@ public class ExceptionHandler {
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         return new ResponseEntity<>(apiError, apiError.getStatus());
+    }
+
+    /**
+     * Handles EntityNotFoundException.
+     * Created to encapsulate errors with more detail than javax.persistence.EntityNotFoundException.
+     *
+     * @param ex the EntityNotFoundException
+     * @return the ApiError object
+     */
+    @org.springframework.web.bind.annotation.ExceptionHandler(EntityNotFoundException.class)
+    protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
+        ApiError apiError = new ApiError(NOT_FOUND);
+        apiError.setMessage(ex.getMessage());
+        return buildResponseEntity(apiError);
     }
 }
