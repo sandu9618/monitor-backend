@@ -6,11 +6,14 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.IOException;
 import java.lang.reflect.MalformedParameterizedTypeException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URI;
+import java.net.URL;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Sanduni Pavithra
@@ -23,20 +26,40 @@ public class ClientWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        System.out.println("adding session .................." + session.getUri());
 
-        stringWebSocketSessionMap.put("client1", session);
+        if (session.getUri() != null){
+            System.out.println("adding session .................." + session.getUri());
+            String client = Objects.requireNonNull(session.getUri()).toString();
+            String clientId = client.substring(client.indexOf("user") + 4);
+
+            if (!stringWebSocketSessionMap.containsKey(clientId)){
+                stringWebSocketSessionMap.put(clientId, session);
+            }
+            System.out.println(stringWebSocketSessionMap.keySet());
+        }
         webSocketSessions.add(session);
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         System.out.println("message" + message.toString());
-        for (WebSocketSession webSocketSession : webSocketSessions) {
-            if (webSocketSession.getUri() != null){
-                webSocketSession.sendMessage(message);
-            }
-        }
+//        for (WebSocketSession webSocketSession : webSocketSessions) {
+//            if (webSocketSession.getUri() != null){
+//                webSocketSession.sendMessage(message);
+//            }
+//        }
+
+        stringWebSocketSessionMap
+                .entrySet()
+                .stream()
+                .filter(v -> v.getValue().getUri() != null)
+                .forEach(v -> {
+                    try {
+                        v.getValue().sendMessage(message);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
     }
 
     @Override

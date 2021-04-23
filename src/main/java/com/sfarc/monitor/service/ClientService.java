@@ -7,9 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import java.io.IOException;
+import java.net.URI;
+import java.util.concurrent.ExecutionException;
+
+import static com.sfarc.monitor.config.Constants.CLIENT_URL;
 
 /**
  * @author Sanduni Pavithra
@@ -24,22 +30,27 @@ public class ClientService {
     ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
     @Autowired
-    WebSocketHandler getChatWebSocketHandler;
+    WebSocketHandler getClientWebSocketHandler;
 
     public void sendToClient(SensorDataDto sensorDataDto) throws IOException {
         try {
             SingleClientSession singleClientSession = new SingleClientSession();
 
-            this.webSocketSession = singleClientSession.getWebSocketSession();
+//            this.webSocketSession = singleClientSession.getWebSocketSession();
+
+            var webSocketClient = new StandardWebSocketClient();
+            this.webSocketSession = webSocketClient.doHandshake(getClientWebSocketHandler, new WebSocketHttpHeaders(), URI.create(CLIENT_URL)).get();
+
+            System.out.println(webSocketSession);
 
             String json = ow.writeValueAsString(sensorDataDto);
 
             webSocketSession.sendMessage(new TextMessage(json));
             webSocketSession.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            webSocketSession.close();
+//            webSocketSession.close();
         }
     }
 }
