@@ -17,6 +17,7 @@ public class SensorService {
     CacheService<List<String>> cacheService;
 
     public List<String> getCurrentSubscriberIds(String sensorId){
-        return cacheService.get(InMemoryHashTypes.SENSOR_LISTENERS, sensorId);
+//        return cacheService.get(InMemoryHashTypes.SENSOR_LISTENERS, sensorId);
+        return List.of("client","bbb","ccc");
     }
 }
