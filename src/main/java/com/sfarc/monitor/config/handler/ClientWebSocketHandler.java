@@ -1,5 +1,9 @@
 package com.sfarc.monitor.config.handler;
 
+import com.sfarc.monitor.service.SensorService;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -11,6 +15,7 @@ import java.lang.reflect.MalformedParameterizedTypeException;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -19,10 +24,14 @@ import java.util.stream.Stream;
  * @author Sanduni Pavithra
  * Created on 4/23/2021
  */
+
+@Component
 public class ClientWebSocketHandler extends TextWebSocketHandler {
 
-    private final List<WebSocketSession> webSocketSessions = new ArrayList<>();
     private final Map<String, WebSocketSession> stringWebSocketSessionMap = new HashMap<>();
+
+    @Autowired
+    SensorService sensorService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -30,34 +39,41 @@ public class ClientWebSocketHandler extends TextWebSocketHandler {
         if (session.getUri() != null){
             System.out.println("adding session .................." + session.getUri());
             String client = Objects.requireNonNull(session.getUri()).toString();
-            String clientId = client.substring(client.indexOf("user") + 4);
+            String clientId = client.substring(client.indexOf("user") + 5);
 
             if (!stringWebSocketSessionMap.containsKey(clientId)){
                 stringWebSocketSessionMap.put(clientId, session);
             }
             System.out.println(stringWebSocketSessionMap.keySet());
         }
-        webSocketSessions.add(session);
     }
 
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        System.out.println("message" + message.toString());
-//        for (WebSocketSession webSocketSession : webSocketSessions) {
-//            if (webSocketSession.getUri() != null){
-//                webSocketSession.sendMessage(message);
-//            }
-//        }
+    protected void handleTextMessage(WebSocketSession session, TextMessage sensorData) throws Exception {
+        System.out.println("message" + sensorData.getPayload());
 
-        stringWebSocketSessionMap
-                .entrySet()
+        JSONObject sensorJson  = new JSONObject(sensorData.getPayload());
+        System.out.println(sensorJson.get("sensorId"));
+
+        List<String> subscriberIds = sensorService.getCurrentSubscriberIds(sensorJson.get("sensorId").toString());
+
+        System.out.println("subscribers = " + subscriberIds);
+
+        Map<String, WebSocketSession> sensorSubscribersSessions = subscriberIds
                 .stream()
+                .filter(stringWebSocketSessionMap::containsKey)
+                .collect(Collectors.toMap(Function.identity(), stringWebSocketSessionMap::get)) ;
+
+        sensorSubscribersSessions.entrySet()
+                .stream()
+                .parallel()
                 .filter(v -> v.getValue().getUri() != null)
                 .forEach(v -> {
                     try {
-                        v.getValue().sendMessage(message);
+                        v.getValue().sendMessage(sensorData);
                     } catch (IOException e) {
                         e.printStackTrace();
+                        // TODO Handle Exception
                     }
                 });
     }
@@ -69,6 +85,10 @@ public class ClientWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        webSocketSessions.remove(session);
+        stringWebSocketSessionMap.entrySet()
+                .stream()
+                .filter(v -> session.equals(v.getValue()))
+                .forEach(k -> stringWebSocketSessionMap.remove(k.getKey()));
+
     }
 }
