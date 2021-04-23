@@ -1,10 +1,15 @@
 package com.sfarc.monitor.config;
 
+import com.sfarc.monitor.config.handler.ClientWebSocketHandler;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.config.annotation.*;
+
+import java.util.concurrent.ExecutionException;
+
+import static com.sfarc.monitor.config.Constants.CLIENT_ENDPOINT;
 
 /**
  * @author Sanduni Pavithra
@@ -12,17 +17,22 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
  */
 
 @Configuration
-@EnableWebSocketMessageBroker
-public class WebSocketConfiguration  implements WebSocketMessageBrokerConfigurer {
+@EnableWebSocket
+public class WebSocketConfiguration  implements WebSocketConfigurer {
 
     @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.setApplicationDestinationPrefixes("/app");
-        config.enableSimpleBroker("/topic");
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
+        try {
+            webSocketHandlerRegistry
+                    .addHandler(getClientWebSocketHandler(), CLIENT_ENDPOINT)
+                    .setAllowedOrigins("*");
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/websocket").setAllowedOrigins("*");
+    @Bean
+    public WebSocketHandler getClientWebSocketHandler() throws ExecutionException, InterruptedException{
+        return new ClientWebSocketHandler();
     }
 }

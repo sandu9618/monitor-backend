@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 /**
  * @author Tharindu Aththnayake
  * @since 04/02/2021 02:53 AM
@@ -28,10 +30,10 @@ public class SensorDataController
 
 	@PostMapping
 	public ResponseEntity<ApiResponse>  collectSensorData( @RequestBody SensorDataDto sensorDataDto )
-			throws BadRequestException
-	{
+			throws BadRequestException, IOException {
+		System.out.println(sensorDataDto);
 		clientService.sendToClient(sensorDataDto);
-		alertService.checkSensorData( sensorDataDto );
+//		alertService.checkSensorData( sensorDataDto );
 
 		ApiResponse apiResponse = ApiResponse
 				.builder()
