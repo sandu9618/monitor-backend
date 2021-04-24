@@ -6,7 +6,9 @@ import com.sfarc.monitor.entity.User;
 import com.sfarc.monitor.repository.SensorRepository;
 import com.sfarc.monitor.repository.UserRepository;
 import com.sfarc.monitor.web.dto.SensorDto;
+import com.sfarc.monitor.web.dto.UserDto;
 import com.sfarc.monitor.web.mappers.SensorMapper;
+import com.sfarc.monitor.web.mappers.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +38,32 @@ public class UserService {
 
     @Autowired
     CacheService<List<String>> cacheService;
+
+    @Autowired
+    UserMapper userMapper;
+
+    public UserDto addSensor(String userId, String sensorId){
+        User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
+        user.getUserSensors().add(sensorId);
+        User saved = userRepository.save(user);
+        return userMapper.userToUserDto(saved);
+    }
+
+    public List<UserDto> getAllUsers(){
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::userToUserDto)
+                .collect(Collectors.toList());
+    }
+
+
+    public UserDto save(UserDto userDto){
+        String userId = userDto.getUserId();
+        if (userRepository.findById(userId).isEmpty()){
+            return userMapper.userToUserDto(userRepository.save(userMapper.userDtoToUser(userDto)));
+        }
+        return userDto;
+    }
 
     private User getUser(String userId){
         return userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);

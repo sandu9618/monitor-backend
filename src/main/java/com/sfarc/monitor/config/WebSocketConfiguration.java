@@ -35,4 +35,6 @@ public class WebSocketConfiguration  implements WebSocketConfigurer {
     public WebSocketHandler getClientWebSocketHandler() throws ExecutionException, InterruptedException{
         return new ClientWebSocketHandler();
     }
+
+
 }

@@ -1,8 +1,8 @@
 package com.sfarc.monitor.web.controller;
 
+import com.sfarc.monitor.service.ClientService;
 import com.sfarc.monitor.web.dto.SensorDataDto;
 import com.sfarc.monitor.service.AlertService;
-import com.sfarc.monitor.service.ClientService;
 import com.sfarc.monitor.web.exception.BadRequestException;
 import com.sfarc.monitor.web.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class SensorDataController
 			throws BadRequestException, IOException {
 		System.out.println(sensorDataDto);
 		clientService.sendToClient(sensorDataDto);
-//		alertService.checkSensorData( sensorDataDto );
+		alertService.checkSensorData( sensorDataDto );
 
 		ApiResponse apiResponse = ApiResponse
 				.builder()
