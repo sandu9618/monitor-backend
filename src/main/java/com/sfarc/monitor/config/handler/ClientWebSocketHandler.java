@@ -85,10 +85,20 @@ public class ClientWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        List<String> toRemove = new ArrayList<>();
         stringWebSocketSessionMap.entrySet()
                 .stream()
                 .filter(v -> session.equals(v.getValue()))
-                .forEach(k -> stringWebSocketSessionMap.remove(k.getKey()));
+                .peek(v -> {
+                    try {
+                        v.getValue().close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                })
+                .forEach(k -> toRemove.add(k.getKey()));
+
+        toRemove.forEach(stringWebSocketSessionMap::remove);
 
     }
 }
