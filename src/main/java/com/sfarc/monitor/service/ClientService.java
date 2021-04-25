@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sfarc.monitor.web.dto.SensorDataDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHandler;
@@ -13,9 +14,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.concurrent.ExecutionException;
 
-import static com.sfarc.monitor.config.Constants.CLIENT_URL;
 
 /**
  * @author Sanduni Pavithra
@@ -32,14 +31,17 @@ public class ClientService {
     @Autowired
     WebSocketHandler getClientWebSocketHandler;
 
+    @Value("${socket.url}")
+    private String clientEndpoint ;
+
     public void sendToClient(SensorDataDto sensorDataDto) throws IOException {
         try {
-            SingleClientSession singleClientSession = new SingleClientSession();
+//            SingleClientSession singleClientSession = new SingleClientSession();
 
 //            this.webSocketSession = singleClientSession.getWebSocketSession();
 
             var webSocketClient = new StandardWebSocketClient();
-            this.webSocketSession = webSocketClient.doHandshake(getClientWebSocketHandler, new WebSocketHttpHeaders(), URI.create(CLIENT_URL)).get();
+            this.webSocketSession = webSocketClient.doHandshake(getClientWebSocketHandler, new WebSocketHttpHeaders(), URI.create(clientEndpoint)).get();
 
             System.out.println(webSocketSession);
 
