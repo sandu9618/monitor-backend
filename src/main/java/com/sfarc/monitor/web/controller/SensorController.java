@@ -6,12 +6,7 @@ import com.sfarc.monitor.web.dto.SensorDto;
 import com.sfarc.monitor.web.response.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,6 +21,26 @@ public class SensorController {
 
 	@Autowired
 	private SensorService sensorService;
+
+	@GetMapping("/{id}")
+	ResponseEntity<ApiResponse> get(@PathVariable String id){
+		ApiResponse apiResponse = ApiResponse
+				.builder()
+				.status(true)
+				.body( sensorService.get(id) )
+				.build();
+		return ResponseEntity.ok(apiResponse);
+	}
+
+	@GetMapping
+	ResponseEntity<ApiResponse> saveSensors(){
+		ApiResponse apiResponse = ApiResponse
+				.builder()
+				.status(true)
+				.body( sensorService.getSensors() )
+				.build();
+		return ResponseEntity.ok(apiResponse);
+	}
 
 	@PostMapping
 	ResponseEntity<ApiResponse> saveSensors( @RequestBody SensorDto sensorDto )

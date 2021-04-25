@@ -8,6 +8,8 @@ import com.sfarc.monitor.web.mappers.SensorMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityExistsException;
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,8 +30,16 @@ public class SensorService {
     SensorMapper sensorMapper;
 
     public List<String> getCurrentSubscriberIds(String sensorId){
-//        return cacheService.get(InMemoryHashTypes.SENSOR_LISTENERS, sensorId);
-        return List.of("sandunipavithra9611@gmail.com","bbb","ccc");
+
+        return cacheService.get(InMemoryHashTypes.SENSOR_LISTENERS, sensorId);
+//        return List.of("client","bbb","ccc");
+    }
+
+    public SensorDto get(String id){
+        System.out.println("gfbfgbfgbfgb     "+id);
+        return sensorMapper.sensorToSensorDto(sensorRepository.findSensorBySensorId(id).orElseThrow(EntityNotFoundException::new));
+
+
     }
 
     public SensorDto save(SensorDto sensorDto){

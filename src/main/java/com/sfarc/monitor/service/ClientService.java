@@ -43,8 +43,6 @@ public class ClientService {
             var webSocketClient = new StandardWebSocketClient();
             this.webSocketSession = webSocketClient.doHandshake(getClientWebSocketHandler, new WebSocketHttpHeaders(), URI.create(clientEndpoint)).get();
 
-            System.out.println(webSocketSession);
-
             String json = ow.writeValueAsString(sensorDataDto);
 
             webSocketSession.sendMessage(new TextMessage(json));

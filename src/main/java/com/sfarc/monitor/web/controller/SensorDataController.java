@@ -20,13 +20,13 @@ import java.io.IOException;
  */
 @RestController
 @RequestMapping("/sensor")
-public class SensorDataController
-{
-	@Autowired
-	private AlertService alertService;
+public class SensorDataController {
+    @Autowired
+    private AlertService alertService;
 
-	@Autowired
-	private ClientService clientService;
+    @Autowired
+    private ClientService clientService;
+
 
 	@PostMapping
 	public ResponseEntity<ApiResponse>  collectSensorData( @RequestBody SensorDataDto sensorDataDto )
@@ -35,11 +35,15 @@ public class SensorDataController
 		 clientService.sendToClient(sensorDataDto);
 		alertService.checkSensorData( sensorDataDto );
 
-		ApiResponse apiResponse = ApiResponse
-				.builder()
-				.status(true)
-				.message("Successfully processed the data")
-				.build();
-		return ResponseEntity.ok(apiResponse);
-	}
+
+        clientService.sendToClient(sensorDataDto);
+        alertService.checkSensorData(sensorDataDto);
+
+        ApiResponse apiResponse = ApiResponse
+                .builder()
+                .status(true)
+                .message("Successfully processed the data")
+                .build();
+        return ResponseEntity.ok(apiResponse);
+    }
 }
