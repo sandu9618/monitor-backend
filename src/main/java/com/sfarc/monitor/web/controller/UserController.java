@@ -92,8 +92,20 @@ public class UserController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @GetMapping("{userId}/notifiers")
+    ResponseEntity<ApiResponse> getUserNotifiers(@PathVariable String userId )
+    {
+        ApiResponse apiResponse = ApiResponse
+                .builder()
+                .status(true)
+                .body( userService.getUserNotifierTypes( userId ) )
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
     @PutMapping("{userId}/notifiers")
-    ResponseEntity<ApiResponse> updateUserSensors(@PathVariable String userId, @RequestBody List<NotifierType> notifierTypes )
+    ResponseEntity<ApiResponse> updateUserNotifiers(@PathVariable String userId, @RequestBody List<NotifierType> notifierTypes )
     {
         ApiResponse apiResponse = ApiResponse
                 .builder()
