@@ -29,7 +29,7 @@ public class SensorService {
 
     public List<String> getCurrentSubscriberIds(String sensorId){
 //        return cacheService.get(InMemoryHashTypes.SENSOR_LISTENERS, sensorId);
-        return List.of("client","bbb","ccc");
+        return List.of("sandunipavithra9611@gmail.com","bbb","ccc");
     }
 
     public SensorDto save(SensorDto sensorDto){
