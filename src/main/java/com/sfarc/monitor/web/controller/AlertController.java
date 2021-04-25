@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
  * Created on 4/25/2021
  */
 
-@ResponseStatus
+@RestController
 @RequestMapping("/alert")
 public class AlertController {
 
@@ -23,7 +23,7 @@ public class AlertController {
     AlertService alertService;
 
     @GetMapping("/user/{user}")
-    ResponseEntity<ApiResponse> getAlerts(@PathVariable String user) {
+    ResponseEntity<ApiResponse> getAlerts(@PathVariable("user") String user) {
         ApiResponse apiResponse = ApiResponse
                 .builder()
                 .status(true)
