@@ -10,6 +10,7 @@ import com.sfarc.monitor.web.dto.SensorDto;
 import com.sfarc.monitor.web.dto.UserDto;
 import com.sfarc.monitor.web.mappers.SensorMapper;
 import com.sfarc.monitor.web.mappers.UserMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ import java.util.stream.Stream;
  * created on 4/19/2021
  */
 
+@Slf4j
 @Service
 public class UserService {
 
@@ -45,7 +47,13 @@ public class UserService {
 
     public UserDto addSensor(String userId, String sensorId){
         User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
-        user.getUserSensors().add(sensorId);
+
+        List<String> userSensors = user.getUserSensors();
+        if (userSensors == null){
+            userSensors = new ArrayList<>();
+        }
+        userSensors.add(sensorId);
+        user.setUserSensors(userSensors);
         User saved = userRepository.save(user);
         return userMapper.userToUserDto(saved);
     }
@@ -68,26 +76,31 @@ public class UserService {
     }
 
     private User getUser(String userId){
-        return userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
+        return userRepository.findByUserId(userId).orElseThrow(EntityNotFoundException::new);
     }
 
     public List<SensorDto> getOwnSensors(String userId)
             throws EntityNotFoundException
     {
+        log.info("calling getOwnSensors with user Id : {}", userId);
         User user = getUser(userId);
 
-        return user.getUserSensors()
+        List<Sensor> sensorList = user.getUserSensors()
                 .stream()
                 .parallel()
-                .map(sensorId -> sensorRepository.findById(sensorId).orElseThrow(EntityNotFoundException::new))
-                .collect(Collectors.toList())
+                .map(sensorId -> sensorRepository.findSensorBySensorId(sensorId).orElseThrow(EntityNotFoundException::new))
+                .collect(Collectors.toList());
+
+        return sensorList
                 .stream()
                 .parallel()
                 .map(sensorMapper::sensorToSensorDto)
                 .collect(Collectors.toList());
     }
 
-    public void selectSensor(String userId, String sensorId){
+    public void selectSensor(String userId, String sensorId, String previousSensorId){
+
+        log.info("calling selectSensor with user id {} and sensor id {}", userId, sensorId);
         User user = getUser(userId);
         boolean userHasAccess = user.getUserSensors()
                 .stream()
@@ -95,17 +108,30 @@ public class UserService {
                 .anyMatch(s -> s.equals(sensorId));
 
         if (userHasAccess){
-            List<String> currentSensorLiters = null;
+
+            if (!previousSensorId.equals("-1")){
+                List<String> previousSensors = cacheService.get(InMemoryHashTypes.SENSOR_LISTENERS, previousSensorId);
+                previousSensors.remove(userId);
+                cacheService.put(InMemoryHashTypes.SENSOR_LISTENERS, previousSensorId, previousSensors);
+            }
+
+            List<String> currentSensorLiters;
             try {
                 currentSensorLiters = cacheService.get(InMemoryHashTypes.SENSOR_LISTENERS, sensorId);
             }catch (Exception e){
                 currentSensorLiters = new ArrayList<>();
             }
 
-            currentSensorLiters.add(userId);
-            cacheService.put(InMemoryHashTypes.SENSOR_LISTENERS, sensorId, currentSensorLiters);
+            if (currentSensorLiters == null){
+                currentSensorLiters = new ArrayList<>();
+            }
+            if (!currentSensorLiters.contains(userId)){
+                currentSensorLiters.add(userId);
+                cacheService.put(InMemoryHashTypes.SENSOR_LISTENERS, sensorId, currentSensorLiters);
+            }
+            log.info("new sensor {} : users : {}", sensorId, currentSensorLiters);
+            log.info("old sensor {} : users : {}", previousSensorId, cacheService.get(InMemoryHashTypes.SENSOR_LISTENERS, previousSensorId));
         }
-
     }
 
     public UserDto updateUserNotificationTypes( String userId, List<NotifierType> notifierTypes ){

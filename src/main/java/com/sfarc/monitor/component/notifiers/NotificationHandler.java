@@ -17,6 +17,7 @@ public class NotificationHandler
 	private VoiceCallNotifier voiceCallNotifier;
 
 	public void notifyAll( final NotificationModel notificationModel ){
+		System.out.println(notificationModel);
 
 		notificationModel.getUser().getUserNotifiers()
 				.stream()

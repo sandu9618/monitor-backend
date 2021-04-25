@@ -1,6 +1,7 @@
 package com.sfarc.monitor.config.handler;
 
 import com.sfarc.monitor.service.SensorService;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  * Created on 4/23/2021
  */
 
+@Slf4j
 @Component
 public class ClientWebSocketHandler extends TextWebSocketHandler {
 
@@ -45,7 +47,7 @@ public class ClientWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage sensorData) throws Exception {
-        System.out.println("message" + sensorData.getPayload());
+//        System.out.println("message" + sensorData.getPayload());
 
         JSONObject sensorJson  = new JSONObject(sensorData.getPayload());
         System.out.println(sensorJson.get("sensorId"));

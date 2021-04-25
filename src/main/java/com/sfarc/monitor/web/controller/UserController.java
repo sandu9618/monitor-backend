@@ -4,7 +4,9 @@ import com.sfarc.monitor.component.notifiers.NotifierType;
 import com.sfarc.monitor.service.SensorService;
 import com.sfarc.monitor.service.UserService;
 import com.sfarc.monitor.web.dto.UserDto;
+import com.sfarc.monitor.web.payoad.SelectSensorRequest;
 import com.sfarc.monitor.web.response.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import java.util.List;
  * created on 4/19/2021
  */
 
+@Slf4j
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -32,7 +35,7 @@ public class UserController {
     @Autowired
     SensorService sensorService;
 
-    @GetMapping("/all")
+    @GetMapping
     ResponseEntity<ApiResponse> getAll(){
         ApiResponse apiResponse = ApiResponse
                 .builder()
@@ -81,9 +84,10 @@ public class UserController {
         return ResponseEntity.ok(apiResponse);
     }
 
-    @PostMapping("{userId}/select/sensor/{sensorId}")
-    ResponseEntity<ApiResponse> selectSensor(@PathVariable String userId, @PathVariable String sensorId){
-        userService.selectSensor(userId, sensorId);
+    @PostMapping("/select-sensor")
+    ResponseEntity<ApiResponse> selectSensor(@RequestBody SelectSensorRequest selectSensorRequest){
+        log.info("calling selectSensor controller ");
+        userService.selectSensor(selectSensorRequest.getUserId(), selectSensorRequest.getSensorId(), selectSensorRequest.getPreviousSensorId());
         ApiResponse apiResponse = ApiResponse
                 .builder()
                 .status(true)
