@@ -24,6 +24,7 @@ import com.sfarc.monitor.web.exception.FailedProcessingSensorDataException;
 
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 /**
  * @author Tharindu Aththnayake
@@ -70,10 +71,16 @@ public class AlertService
 		{
 			if (logic.check( alert.getValue() ))
 			{
-				User user = userRepository.findUserByUserSensors( alert.getSensorId() ).orElseThrow(EntityNotFoundException::new);
-				Sensor sensor = sensorRepository.findSensorBySensorId( alert.getSensorId() ).orElseThrow(EntityNotFoundException::new);
-				notificationHandler.notifyAll(  notificationModelConverter.convert( user, sensor, alert ) );
-				alertRepository.save( alert ); // TODO: alertRepository should save alert data, not sensor data
+				List<User> users = userRepository.findUsersByUserSensors( alert.getSensorId() );
+
+				if (!users.isEmpty()){
+					Sensor sensor = sensorRepository.findSensorBySensorId( alert.getSensorId() ).orElseThrow(EntityNotFoundException::new);
+					for( User u : users ) {
+						notificationHandler.notifyAll(  notificationModelConverter.convert( u, sensor, alert ));
+					}
+					alertRepository.save( alert ); // TODO: alertRepository should save alert data, not sensor data
+				}
+
 			}
 
 		}
