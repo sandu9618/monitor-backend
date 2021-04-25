@@ -30,6 +30,7 @@ public class SensorService {
     SensorMapper sensorMapper;
 
     public List<String> getCurrentSubscriberIds(String sensorId){
+
         return cacheService.get(InMemoryHashTypes.SENSOR_LISTENERS, sensorId);
 //        return List.of("client","bbb","ccc");
     }
@@ -37,6 +38,8 @@ public class SensorService {
     public SensorDto get(String id){
         System.out.println("gfbfgbfgbfgb     "+id);
         return sensorMapper.sensorToSensorDto(sensorRepository.findSensorBySensorId(id).orElseThrow(EntityNotFoundException::new));
+
+
     }
 
     public SensorDto save(SensorDto sensorDto){

@@ -27,9 +27,14 @@ public class SensorDataController {
     @Autowired
     private ClientService clientService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse> collectSensorData(@RequestBody SensorDataDto sensorDataDto)
-            throws BadRequestException, IOException {
+
+	@PostMapping
+	public ResponseEntity<ApiResponse>  collectSensorData( @RequestBody SensorDataDto sensorDataDto )
+			throws BadRequestException, IOException {
+		System.out.println(sensorDataDto);
+		 clientService.sendToClient(sensorDataDto);
+		alertService.checkSensorData( sensorDataDto );
+
 
         clientService.sendToClient(sensorDataDto);
         alertService.checkSensorData(sensorDataDto);

@@ -92,4 +92,11 @@ public class AlertService
 		}
 
 	}
+
+	public List<Alert> getAlerts(String username){
+
+		User user = userRepository.findUserByUsername(username);
+
+		return alertRepository.findAlertsBySensorIdIn(user.getUserSensors());
+	}
 }

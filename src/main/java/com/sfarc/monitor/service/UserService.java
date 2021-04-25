@@ -140,4 +140,9 @@ public class UserService {
         User saved = userRepository.save(user);
         return userMapper.userToUserDto(saved);
     }
+
+    public List<NotifierType> getUserNotifierTypes( String userId ){
+        User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
+        return user.getUserNotifiers();
+    }
 }
