@@ -32,8 +32,8 @@ public class SensorDataController
 	public ResponseEntity<ApiResponse>  collectSensorData( @RequestBody SensorDataDto sensorDataDto )
 			throws BadRequestException, IOException {
 		System.out.println(sensorDataDto);
-		clientService.sendToClient(sensorDataDto);
-//		alertService.checkSensorData( sensorDataDto );
+		// clientService.sendToClient(sensorDataDto);
+		alertService.checkSensorData( sensorDataDto );
 
 		ApiResponse apiResponse = ApiResponse
 				.builder()

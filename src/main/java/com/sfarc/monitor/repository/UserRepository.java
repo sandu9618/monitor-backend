@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface UserRepository extends MongoRepository< User , String >
 {
-	Optional<User> findUserByUserSensors( String userSensor );
+	List<User> findUsersByUserSensors( String userSensor );
 }
