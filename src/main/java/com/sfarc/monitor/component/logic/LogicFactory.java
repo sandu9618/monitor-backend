@@ -19,7 +19,6 @@ public class LogicFactory
 
 	public Logic findLogic( LogicName logicName)
 	{
-		System.out.println(logicName);
 		Logic logic = null;
 
 		if (logics.containsKey( logicName ))

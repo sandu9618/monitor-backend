@@ -1,5 +1,6 @@
 package com.sfarc.monitor.web.controller;
 
+import com.sfarc.monitor.component.notifiers.NotifierType;
 import com.sfarc.monitor.service.SensorService;
 import com.sfarc.monitor.service.UserService;
 import com.sfarc.monitor.web.dto.UserDto;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 /**
  * @author madhuwantha
@@ -85,6 +87,18 @@ public class UserController {
         ApiResponse apiResponse = ApiResponse
                 .builder()
                 .status(true)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @PutMapping("{userId}/notifiers")
+    ResponseEntity<ApiResponse> updateUserSensors(@PathVariable String userId, @RequestBody List<NotifierType> notifierTypes )
+    {
+        ApiResponse apiResponse = ApiResponse
+                .builder()
+                .status(true)
+                .body( userService.updateUserNotificationTypes( userId, notifierTypes ) )
                 .build();
 
         return ResponseEntity.ok(apiResponse);

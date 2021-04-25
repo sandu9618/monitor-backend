@@ -6,11 +6,12 @@ import com.sfarc.monitor.component.logic.LogicFactory;
 import com.sfarc.monitor.component.logic.LogicFinder;
 import com.sfarc.monitor.component.model.NotificationModel;
 import com.sfarc.monitor.component.notifiers.EmailNotifier;
+import com.sfarc.monitor.component.notifiers.NotificationHandler;
 import com.sfarc.monitor.component.notifiers.SMSNotifier;
 import com.sfarc.monitor.component.notifiers.VoiceCallNotifier;
 import com.sfarc.monitor.web.dto.SensorDataDto;
 import com.sfarc.monitor.entity.Sensor;
-import com.sfarc.monitor.entity.SensorData;
+import com.sfarc.monitor.entity.Alert;
 import com.sfarc.monitor.entity.User;
 import com.sfarc.monitor.repository.AlertRepository;
 import com.sfarc.monitor.repository.SensorRepository;
@@ -23,7 +24,7 @@ import com.sfarc.monitor.web.exception.FailedProcessingSensorDataException;
 
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Optional;
+import java.util.List;
 
 /**
  * @author Tharindu Aththnayake
@@ -49,13 +50,7 @@ public class AlertService
 	private NotificationModelConverter notificationModelConverter;
 
 	@Autowired
-	private EmailNotifier emailNotifier;
-
-	@Autowired
-	private SMSNotifier smsNotifier;
-
-	@Autowired
-	private VoiceCallNotifier voiceCallNotifier;
+	private NotificationHandler notificationHandler;
 
 	@Autowired
 	private SensorDataMapper sensorDataMapper;
@@ -69,21 +64,23 @@ public class AlertService
 	 */
 	public void checkSensorData(SensorDataDto sensorDataDto)
 	{
-		SensorData sensorData = sensorDataMapper.sensorDtaDtoToSensorData(sensorDataDto);
-		Logic logic = logicFactory.findLogic( LogicFinder.findLogicName( sensorData.getSensorId() ) );
+		Alert alert = sensorDataMapper.sensorDtaDtoToSensorData(sensorDataDto);
+		Logic logic = logicFactory.findLogic( LogicFinder.findLogicName( alert.getSensorId() ) );
 
 		try
 		{
-			if (logic.check( sensorData.getValue() ))
+			if (logic.check( alert.getValue() ))
 			{
-				User user = userRepository.findUserByUserSensors( sensorData.getSensorId() ).orElseThrow(EntityNotFoundException::new);
-				Sensor sensor = sensorRepository.findSensorBySensorId( sensorData.getSensorId() ).orElseThrow(EntityNotFoundException::new);
-				NotificationModel notificationModel = notificationModelConverter.convert( user, sensor, sensorData  );
-				emailNotifier.notifyUser( notificationModel );
-				voiceCallNotifier.notifyUser( notificationModel );
-				smsNotifier.notifyUser( notificationModel );
+				List<User> users = userRepository.findUsersByUserSensors( alert.getSensorId() );
 
-				alertRepository.save( sensorData ); // TODO: alertRepository should save alert data, not sensor data
+				if (!users.isEmpty()){
+					Sensor sensor = sensorRepository.findSensorBySensorId( alert.getSensorId() ).orElseThrow(EntityNotFoundException::new);
+					for( User u : users ) {
+						notificationHandler.notifyAll(  notificationModelConverter.convert( u, sensor, alert ));
+					}
+					alertRepository.save( alert ); // TODO: alertRepository should save alert data, not sensor data
+				}
+
 			}
 
 		}

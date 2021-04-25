@@ -9,6 +9,6 @@ public class SMSNotifier implements Notifier
 	@Override
 	public void notifyUser( NotificationModel notificationModel )
 	{
-		System.out.println("SMS will be send to user");
+		System.out.println("SMS will be send to user " + notificationModel.getUser().getUsername() );
 	}
 }
