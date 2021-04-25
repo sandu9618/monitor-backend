@@ -1,6 +1,7 @@
 package com.sfarc.monitor.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.sfarc.monitor.component.notifiers.NotifierType;
 import com.sun.istack.Nullable;
 import lombok.*;
 
@@ -38,6 +39,9 @@ public class UserDto {
 
     @Nullable
     private List<String> userSensors;
+
+    @Nullable
+    private List<NotifierType> userNotifiers;
 
     @Null
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssZ", shape=JsonFormat.Shape.STRING)

@@ -43,5 +43,10 @@ public class SensorService {
                 .collect(Collectors.toList());
     }
 
+    public SensorDto addSensor(SensorDto sensorDto){
+        Sensor savedSensor = sensorRepository.save( sensorMapper.sensorDtoToSensor( sensorDto ) );
+        return sensorMapper.sensorToSensorDto( savedSensor );
+    }
+
 
 }

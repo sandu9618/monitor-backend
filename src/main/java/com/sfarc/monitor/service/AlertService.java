@@ -6,6 +6,7 @@ import com.sfarc.monitor.component.logic.LogicFactory;
 import com.sfarc.monitor.component.logic.LogicFinder;
 import com.sfarc.monitor.component.model.NotificationModel;
 import com.sfarc.monitor.component.notifiers.EmailNotifier;
+import com.sfarc.monitor.component.notifiers.NotificationHandler;
 import com.sfarc.monitor.component.notifiers.SMSNotifier;
 import com.sfarc.monitor.component.notifiers.VoiceCallNotifier;
 import com.sfarc.monitor.web.dto.SensorDataDto;
@@ -48,13 +49,7 @@ public class AlertService
 	private NotificationModelConverter notificationModelConverter;
 
 	@Autowired
-	private EmailNotifier emailNotifier;
-
-	@Autowired
-	private SMSNotifier smsNotifier;
-
-	@Autowired
-	private VoiceCallNotifier voiceCallNotifier;
+	private NotificationHandler notificationHandler;
 
 	@Autowired
 	private SensorDataMapper sensorDataMapper;
@@ -77,11 +72,7 @@ public class AlertService
 			{
 				User user = userRepository.findUserByUserSensors( alert.getSensorId() ).orElseThrow(EntityNotFoundException::new);
 				Sensor sensor = sensorRepository.findSensorBySensorId( alert.getSensorId() ).orElseThrow(EntityNotFoundException::new);
-				NotificationModel notificationModel = notificationModelConverter.convert( user, sensor, alert );
-				// emailNotifier.notifyUser( notificationModel );
-				// voiceCallNotifier.notifyUser( notificationModel );
-				// smsNotifier.notifyUser( notificationModel );
-
+				notificationHandler.notifyAll(  notificationModelConverter.convert( user, sensor, alert ) );
 				alertRepository.save( alert ); // TODO: alertRepository should save alert data, not sensor data
 			}
 

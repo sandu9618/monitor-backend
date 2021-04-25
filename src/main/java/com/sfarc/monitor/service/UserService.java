@@ -1,5 +1,6 @@
 package com.sfarc.monitor.service;
 
+import com.sfarc.monitor.component.notifiers.NotifierType;
 import com.sfarc.monitor.config.InMemoryHashTypes;
 import com.sfarc.monitor.entity.Sensor;
 import com.sfarc.monitor.entity.User;
@@ -59,6 +60,7 @@ public class UserService {
 
     public UserDto save(UserDto userDto){
         String userId = userDto.getUserId();
+
         if (userRepository.findById(userId).isEmpty()){
             return userMapper.userToUserDto(userRepository.save(userMapper.userDtoToUser(userDto)));
         }
@@ -104,5 +106,12 @@ public class UserService {
             cacheService.put(InMemoryHashTypes.SENSOR_LISTENERS, sensorId, currentSensorLiters);
         }
 
+    }
+
+    public UserDto updateUserNotificationTypes( String userId, List<NotifierType> notifierTypes ){
+        User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
+        user.setUserNotifiers(  notifierTypes );
+        User saved = userRepository.save(user);
+        return userMapper.userToUserDto(saved);
     }
 }

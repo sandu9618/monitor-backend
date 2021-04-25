@@ -1,5 +1,6 @@
 package com.sfarc.monitor.entity;
 
+import com.sfarc.monitor.component.notifiers.NotifierType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,5 +21,5 @@ public class User
 	private String email;
 	private String telephone;
 	private List<String> userSensors;
-	private List<>
+	private List<NotifierType> userNotifiers;
 }
