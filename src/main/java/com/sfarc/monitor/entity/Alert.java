@@ -19,10 +19,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
-@Document(collection = "sensor_data")
-public class SensorData
+@Document(collection = "alert")
+public class Alert
 {
 	@Id
+	private String alertId;
+
 	private String sensorId;
 
 	@CreationTimestamp

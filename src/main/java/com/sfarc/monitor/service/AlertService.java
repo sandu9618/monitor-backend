@@ -10,7 +10,7 @@ import com.sfarc.monitor.component.notifiers.SMSNotifier;
 import com.sfarc.monitor.component.notifiers.VoiceCallNotifier;
 import com.sfarc.monitor.web.dto.SensorDataDto;
 import com.sfarc.monitor.entity.Sensor;
-import com.sfarc.monitor.entity.SensorData;
+import com.sfarc.monitor.entity.Alert;
 import com.sfarc.monitor.entity.User;
 import com.sfarc.monitor.repository.AlertRepository;
 import com.sfarc.monitor.repository.SensorRepository;
@@ -23,7 +23,6 @@ import com.sfarc.monitor.web.exception.FailedProcessingSensorDataException;
 
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Optional;
 
 /**
  * @author Tharindu Aththnayake
@@ -69,21 +68,21 @@ public class AlertService
 	 */
 	public void checkSensorData(SensorDataDto sensorDataDto)
 	{
-		SensorData sensorData = sensorDataMapper.sensorDtaDtoToSensorData(sensorDataDto);
-		Logic logic = logicFactory.findLogic( LogicFinder.findLogicName( sensorData.getSensorId() ) );
+		Alert alert = sensorDataMapper.sensorDtaDtoToSensorData(sensorDataDto);
+		Logic logic = logicFactory.findLogic( LogicFinder.findLogicName( alert.getSensorId() ) );
 
 		try
 		{
-			if (logic.check( sensorData.getValue() ))
+			if (logic.check( alert.getValue() ))
 			{
-				User user = userRepository.findUserByUserSensors( sensorData.getSensorId() ).orElseThrow(EntityNotFoundException::new);
-				Sensor sensor = sensorRepository.findSensorBySensorId( sensorData.getSensorId() ).orElseThrow(EntityNotFoundException::new);
-				NotificationModel notificationModel = notificationModelConverter.convert( user, sensor, sensorData  );
-				emailNotifier.notifyUser( notificationModel );
-				voiceCallNotifier.notifyUser( notificationModel );
-				smsNotifier.notifyUser( notificationModel );
+				User user = userRepository.findUserByUserSensors( alert.getSensorId() ).orElseThrow(EntityNotFoundException::new);
+				Sensor sensor = sensorRepository.findSensorBySensorId( alert.getSensorId() ).orElseThrow(EntityNotFoundException::new);
+				NotificationModel notificationModel = notificationModelConverter.convert( user, sensor, alert );
+				// emailNotifier.notifyUser( notificationModel );
+				// voiceCallNotifier.notifyUser( notificationModel );
+				// smsNotifier.notifyUser( notificationModel );
 
-				alertRepository.save( sensorData ); // TODO: alertRepository should save alert data, not sensor data
+				alertRepository.save( alert ); // TODO: alertRepository should save alert data, not sensor data
 			}
 
 		}

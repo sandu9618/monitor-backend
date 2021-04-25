@@ -20,4 +20,5 @@ public class User
 	private String email;
 	private String telephone;
 	private List<String> userSensors;
+	private List<>
 }
