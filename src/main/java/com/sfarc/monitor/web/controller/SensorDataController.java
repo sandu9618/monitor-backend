@@ -33,7 +33,7 @@ public class SensorDataController
 			throws BadRequestException, IOException {
 		System.out.println(sensorDataDto);
 		clientService.sendToClient(sensorDataDto);
-		alertService.checkSensorData( sensorDataDto );
+//		alertService.checkSensorData( sensorDataDto );
 
 		ApiResponse apiResponse = ApiResponse
 				.builder()
