@@ -30,11 +30,11 @@ public class DataSource {
 
     Random rand = new Random();
 
-//    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 500)
     public void greeting() {
         SensorDataDto sensorDataDto = SensorDataDto
                 .builder()
-                .value(rand.nextInt(25) + 1+"C")
+                .value(rand.nextInt(10) + 1+"C")
                 .date(LocalDateTime.now())
                 .sensorId("TE02")
                 .build();
